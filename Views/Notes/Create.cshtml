@@ -1,0 +1,27 @@
+﻿@model Note
+
+@{
+	ViewData["Title"] = "Create Note";
+}
+
+<h1>Create new note</h1>
+<hr />
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<form asp-controller="Notes" asp-action="Create">
+	<div class="mb-3">
+		<label asp-for="Text" class="form-label"></label>
+		<input type="text" asp-for="Text" name="Text" class="form-control"/>
+		<span asp-validation-for="Text" class="text-danger"></span>
+	</div>
+
+	<button type="submit" class="btn btn-primary">Add</button>
+</form>
+
+
+
+@* Not needed for now, but we would if other type of validations were needed, such as credit cards*@
+@section Scripts{
+	<partial name="_ValidationScriptsPartial"/>
+}
