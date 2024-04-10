@@ -1,18 +1,20 @@
 ﻿@model Note
 
 @{
-	ViewData["Title"] = "Create Note";
+	ViewData["Title"] = "Edit";
 }
 
-<h1>Create new note</h1>
+<h1>Edit note: @Model.Text</h1>
 <hr />
 
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-<form asp-controller="Notes" asp-action="Create">
+<form asp-controller="Notes" asp-action="Edit">
+	<input type="hidden" asp-for="Id"/>
+
 	<div class="mb-3">
 		<label asp-for="Text" class="form-label"></label>
-		<input type="text" asp-for="Text" name="Text" class="form-control"/>
+		<input type="text" asp-for="Text" name="Text" class="form-control" />
 		<span asp-validation-for="Text" class="text-danger"></span>
 	</div>
 
@@ -24,6 +26,7 @@
 
 
 @* Not needed for now, but we would if other type of validations were needed, such as credit cards*@
-@section Scripts{
-	<partial name="_ValidationScriptsPartial"/>
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
 }
+

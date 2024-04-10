@@ -1,10 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Notes.Data;
+using Notes.Repositories;
+using Notes.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddTransient<IRepositoryNotes, RepositotyNotes>();
+builder.Services.AddTransient<IRepositoryNoteLike, RepositotyNoteLike>();
+builder.Services.AddTransient<IUserService, UserService>();
 
 //configure the db context for our models
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer("name=DefaultConnection"));
