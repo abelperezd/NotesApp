@@ -28,7 +28,7 @@ namespace Notes.Controllers
 		{
 			int userId = _userService.GetUserId();
 
-			var notes = await _repositoryNotes.GetAll(userId);
+			IEnumerable<Note> notes = await _repositoryNotes.GetAll(userId);
 
 			return View(notes);
 		}
@@ -37,20 +37,22 @@ namespace Notes.Controllers
 
 		public IActionResult Create()
 		{
-			NoteViewModel model = new NoteViewModel();
+			CreateNoteDto model = new CreateNoteDto();
 			model.NoteImportance = GetNoteImportance();
 
 			return View(model);
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Create(NoteViewModel note)
+		public async Task<IActionResult> Create(CreateNoteDto noteDto)
 		{
 			if (!ModelState.IsValid)
 			{
-				note.NoteImportance = GetNoteImportance();
-				return View(note);
+				noteDto.NoteImportance = GetNoteImportance();
+				return View(noteDto);
 			}
+
+			Note note = _mapper.Map<Note>(noteDto);
 
 			note.CreationDate = DateTime.Now;
 			note.UserId = _userService.GetUserId();
@@ -58,16 +60,15 @@ namespace Notes.Controllers
 			//check if the user already has this note
 			if (await _repositoryNotes.Exists(note.Text, note.UserId))
 			{
-				ModelState.AddModelError(nameof(note.Text), $"Text {note.Text} already exists.");
-				return View(note);
+				noteDto.NoteImportance = GetNoteImportance();
+				ModelState.AddModelError(nameof(noteDto.Text), $"Text {noteDto.Text} already exists.");
+				return View(noteDto);
 			}
-
 
 			await _repositoryNotes.Create(note);
 
 			return RedirectToAction("Index");
 		}
-
 
 
 		#endregion
@@ -85,10 +86,10 @@ namespace Notes.Controllers
 				return RedirectToAction(NOT_FOUND_REDIRECT, "Home");
 			}
 
-			NoteViewModel model = _mapper.Map<NoteViewModel>(note);
-			model.NoteImportance = GetNoteImportance();
+			EditNoteDto noteDto = _mapper.Map<EditNoteDto>(note);
+			noteDto.NoteImportance = GetNoteImportance();
 
-			return View(model);
+			return View(noteDto);
 		}
 
 		[HttpPost]

@@ -7,7 +7,9 @@ namespace Notes.Mapping
 	{
 		public AutoMapperProfiles()
 		{
-			CreateMap<Note, NoteViewModel>();
+			CreateMap<CreateNoteDto, Note>();
+			CreateMap<Note, EditNoteDto>();
+			CreateMap<EditNoteDto, Note>();
 		}
 	}
 }
