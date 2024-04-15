@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Notes.Models;
 using Notes.Repositories;
 using Notes.Services;
@@ -11,11 +13,15 @@ namespace Notes.Controllers
 
 		private readonly IRepositoryNotes _repositoryNotes;
 		private readonly IUserService _userService;
+		private readonly IRepositoryNoteImportance _noteImportance;
+		private readonly IMapper _mapper;
 
-		public NotesController(IRepositoryNotes repositoryNotes, IUserService userService)
+		public NotesController(IRepositoryNotes repositoryNotes, IUserService userService, IRepositoryNoteImportance noteImportance, IMapper mapper)
 		{
 			_repositoryNotes = repositoryNotes;
 			_userService = userService;
+			_noteImportance = noteImportance;
+			_mapper = mapper;
 		}
 
 		public async Task<IActionResult> Index()
@@ -31,14 +37,18 @@ namespace Notes.Controllers
 
 		public IActionResult Create()
 		{
-			return View();
+			NoteViewModel model = new NoteViewModel();
+			model.NoteImportance = GetNoteImportance();
+
+			return View(model);
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Create(Note note)
+		public async Task<IActionResult> Create(NoteViewModel note)
 		{
 			if (!ModelState.IsValid)
 			{
+				note.NoteImportance = GetNoteImportance();
 				return View(note);
 			}
 
@@ -58,6 +68,8 @@ namespace Notes.Controllers
 			return RedirectToAction("Index");
 		}
 
+
+
 		#endregion
 
 		#region Edit
@@ -68,12 +80,15 @@ namespace Notes.Controllers
 			int userId = _userService.GetUserId();
 			Note note = await _repositoryNotes.GetById(id, userId);
 
-			if(note == null)
+			if (note == null)
 			{
 				return RedirectToAction(NOT_FOUND_REDIRECT, "Home");
 			}
 
-			return View(note);
+			NoteViewModel model = _mapper.Map<NoteViewModel>(note);
+			model.NoteImportance = GetNoteImportance();
+
+			return View(model);
 		}
 
 		[HttpPost]
@@ -141,6 +156,13 @@ namespace Notes.Controllers
 			return noteAlreadyExist
 				? Json($"Note {text} already exists.")
 				: Json(true);
+		}
+
+		private IEnumerable<SelectListItem> GetNoteImportance()
+		{
+			IEnumerable<NoteImportance> noteImportance = _noteImportance.GetAll().Result;
+
+			return noteImportance.Select(item => new SelectListItem(item.Importance, item.Id.ToString()));
 		}
 
 		#endregion

@@ -1,4 +1,4 @@
-﻿@model Note
+﻿@model NoteViewModel
 
 @{
 	ViewData["Title"] = "Create Note";
@@ -12,18 +12,23 @@
 <form asp-controller="Notes" asp-action="Create">
 	<div class="mb-3">
 		<label asp-for="Text" class="form-label"></label>
-		<input type="text" asp-for="Text" name="Text" class="form-control"/>
+		<input type="text" asp-for="Text" name="Text" class="form-control" />
 		<span asp-validation-for="Text" class="text-danger"></span>
 	</div>
 
-	<button type="submit" class="btn btn-primary">Add</button>
+	<div class="mb-3">
+		<label asp-for="NoteImportanceId" class="form-label"></label>
+		<select asp-for="NoteImportanceId" asp-items="Model.NoteImportance" class="form-select"></select>
+		<span asp-validation-for="NoteImportanceId" class="text-danger"></span>
+	</div>
 
+	<button type="submit" class="btn btn-primary">Add</button>
 	<a class="btn btn-secondary" asp-action="Index">Cancel</a>
 </form>
 
 
 
 @* Not needed for now, but we would if other type of validations were needed, such as credit cards*@
-@section Scripts{
-	<partial name="_ValidationScriptsPartial"/>
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
 }

@@ -9,8 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IRepositoryNotes, RepositotyNotes>();
 builder.Services.AddTransient<IRepositoryNoteLike, RepositotyNoteLike>();
+builder.Services.AddTransient<IRepositoryNoteImportance, RepositotyNoteImportance>();
 builder.Services.AddTransient<IUserService, UserService>();
-
+builder.Services.AddAutoMapper(typeof(Program));
 //configure the db context for our models
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer("name=DefaultConnection"));
 

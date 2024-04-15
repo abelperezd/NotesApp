@@ -10,7 +10,6 @@ namespace Notes.Models
 	/// </summary>
 	public class NoteImportance
 	{
-		
 		public int Id { get; set; }
 
 		public string Importance { get; set; }
