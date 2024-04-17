@@ -8,8 +8,7 @@ namespace Notes.Mapping
 		public AutoMapperProfiles()
 		{
 			CreateMap<CreateNoteDto, Note>();
-			CreateMap<Note, EditNoteDto>();
-			CreateMap<EditNoteDto, Note>();
+			CreateMap<Note, EditNoteDto>().ReverseMap();
 		}
 	}
 }

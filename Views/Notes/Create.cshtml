@@ -18,6 +18,7 @@
 
 	<div class="mb-3">
 		<label asp-for="NoteImportanceId" class="form-label"></label>
+		@* NOTE: this could be done using an enum instad. asp-items would contain -> asp-items="Html.GetEnumSelectList<EnumClassName>()"*@
 		<select asp-for="NoteImportanceId" asp-items="Model.NoteImportance" class="form-select"></select>
 		<span asp-validation-for="NoteImportanceId" class="text-danger"></span>
 	</div>

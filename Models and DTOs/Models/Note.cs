@@ -23,6 +23,7 @@ namespace Notes.Models
 
 		#region Linked objects
 
+		public NoteImportance? NoteImportance { get; set; }	
 		public User? User { get; set; }
 		public List<NoteLike>? Likes { get; set; }
 
