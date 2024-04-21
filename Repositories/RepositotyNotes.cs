@@ -46,7 +46,8 @@ namespace Notes.Repositories
             return _context.Note
                 .Include(item => item.Likes)
                 .Include(item => item.NoteImportance)
-                .Where(item => item.UserId == userId);
+                .Include(item => item.User);
+                //.Where(item => item.UserId == userId);
         }
 
         public async Task Update(Note note)

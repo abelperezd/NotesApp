@@ -7,165 +7,167 @@ using Notes.Services;
 
 namespace Notes.Controllers
 {
-	public class NotesController : Controller
-	{
-		private const string NOT_FOUND_REDIRECT = "NotFound";
+    public class NotesController : Controller
+    {
+        private const string NOT_FOUND_REDIRECT = "NotFound";
 
-		private readonly IRepositoryNotes _repositoryNotes;
-		private readonly IUserService _userService;
-		private readonly IRepositoryNoteImportance _noteImportance;
-		private readonly IMapper _mapper;
+        private readonly IRepositoryNotes _repositoryNotes;
+        private readonly IUserService _userService;
+        private readonly IRepositoryNoteImportance _repositoryNoteImportance;
+        private readonly IMapper _mapper;
 
-		public NotesController(IRepositoryNotes repositoryNotes, IUserService userService, IRepositoryNoteImportance noteImportance, IMapper mapper)
-		{
-			_repositoryNotes = repositoryNotes;
-			_userService = userService;
-			_noteImportance = noteImportance;
-			_mapper = mapper;
-		}
+        public NotesController(IRepositoryNotes repositoryNotes, IUserService userService, IRepositoryNoteImportance noteImportance, IMapper mapper)
+        {
+            _repositoryNotes = repositoryNotes;
+            _userService = userService;
+            _repositoryNoteImportance = noteImportance;
+            _mapper = mapper;
+        }
 
-		public async Task<IActionResult> Index()
-		{
-			int userId = _userService.GetUserId();
+        public async Task<IActionResult> Index()
+        {
+            int userId = _userService.GetUserId();
 
-			IEnumerable<Note> notes = await _repositoryNotes.GetAll(userId);
+            IndexNoteDto dto = new IndexNoteDto();
+            dto.Notes = await _repositoryNotes.GetAll(userId);
+            dto.UserId = _userService.GetUserId();
 
-			return View(notes);
-		}
+            return View(dto);
+        }
 
-		#region Create
+        #region Create
 
-		public IActionResult Create()
-		{
-			CreateNoteDto model = new CreateNoteDto();
-			model.NoteImportance = GetNoteImportance();
+        public IActionResult Create()
+        {
+            CreateNoteDto model = new CreateNoteDto();
+            model.NoteImportance = GetNoteImportance();
 
-			return View(model);
-		}
+            return View(model);
+        }
 
-		[HttpPost]
-		public async Task<IActionResult> Create(CreateNoteDto noteDto)
-		{
-			if (!ModelState.IsValid)
-			{
-				noteDto.NoteImportance = GetNoteImportance();
-				return View(noteDto);
-			}
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateNoteDto noteDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                noteDto.NoteImportance = GetNoteImportance();
+                return View(noteDto);
+            }
 
-			Note note = _mapper.Map<Note>(noteDto);
+            Note note = _mapper.Map<Note>(noteDto);
 
-			note.CreationDate = DateTime.Now;
-			note.UserId = _userService.GetUserId();
+            note.CreationDate = DateTime.Now;
+            note.UserId = _userService.GetUserId();
 
-			//check if the user already has this note
-			if (await _repositoryNotes.Exists(note.Text, note.UserId))
-			{
-				noteDto.NoteImportance = GetNoteImportance();
-				ModelState.AddModelError(nameof(noteDto.Text), $"Text {noteDto.Text} already exists.");
-				return View(noteDto);
-			}
+            //check if the user already has this note
+            if (await _repositoryNotes.Exists(note.Text, note.UserId))
+            {
+                noteDto.NoteImportance = GetNoteImportance();
+                ModelState.AddModelError(nameof(noteDto.Text), $"Text {noteDto.Text} already exists.");
+                return View(noteDto);
+            }
 
-			await _repositoryNotes.Create(note);
+            await _repositoryNotes.Create(note);
 
-			return RedirectToAction("Index");
-		}
-
-
-		#endregion
-
-		#region Edit
-
-		[HttpGet]
-		public async Task<ActionResult> Edit(int id)
-		{
-			int userId = _userService.GetUserId();
-			Note note = await _repositoryNotes.GetById(id, userId);
-
-			if (note == null)
-			{
-				return RedirectToAction(NOT_FOUND_REDIRECT, "Home");
-			}
-
-			EditNoteDto noteDto = _mapper.Map<EditNoteDto>(note);
-			noteDto.NoteImportance = GetNoteImportance();
-
-			return View(noteDto);
-		}
-
-		[HttpPost]
-		public async Task<ActionResult> Edit(Note note)
-		{
-			int userId = _userService.GetUserId();
-			bool exists = await _repositoryNotes.GetById(note.Id, userId) != null;
-
-			if (!exists)
-			{
-				return RedirectToAction(NOT_FOUND_REDIRECT, "Home");
-			}
-
-			await _repositoryNotes.Update(note);
-
-			return RedirectToAction("Index");
-		}
+            return RedirectToAction("Index");
+        }
 
 
-		#endregion
+        #endregion
 
-		#region Delete
+        #region Edit
 
-		public async Task<IActionResult> Delete(int id)
-		{
-			int userId = _userService.GetUserId();
+        [HttpGet]
+        public async Task<ActionResult> Edit(int id)
+        {
+            int userId = _userService.GetUserId();
+            Note note = await _repositoryNotes.GetById(id, userId);
 
-			Note note = await _repositoryNotes.GetById(id, userId);
+            if (note == null)
+            {
+                return RedirectToAction(NOT_FOUND_REDIRECT, "Home");
+            }
 
-			if (note == null)
-			{
-				return RedirectToAction(NOT_FOUND_REDIRECT, "Home");
-			}
+            EditNoteDto noteDto = _mapper.Map<EditNoteDto>(note);
+            noteDto.NoteImportance = GetNoteImportance();
 
-			return View(note);
-		}
+            return View(noteDto);
+        }
 
-		[HttpPost]
-		public async Task<IActionResult> DeleteNote(int id)
-		{
-			int userId = _userService.GetUserId();
+        [HttpPost]
+        public async Task<ActionResult> Edit(Note note)
+        {
+            int userId = _userService.GetUserId();
+            bool exists = await _repositoryNotes.GetById(note.Id, userId) != null;
 
-			Note note = await _repositoryNotes.GetById(id, userId);
+            if (!exists)
+            {
+                return RedirectToAction(NOT_FOUND_REDIRECT, "Home");
+            }
 
-			if (note == null)
-			{
-				return RedirectToAction(NOT_FOUND_REDIRECT, "Home");
-			}
+            await _repositoryNotes.Update(note);
 
-			await _repositoryNotes.Delete(id);
-
-			return RedirectToAction("Index");
-		}
+            return RedirectToAction("Index");
+        }
 
 
-		#endregion
+        #endregion
 
-		#region Other
+        #region Delete
 
-		[HttpGet]
-		public async Task<IActionResult> VerifyIfNoteAlreadyExist(string text)
-		{
-			bool noteAlreadyExist = await _repositoryNotes.Exists(text, _userService.GetUserId());
+        public async Task<IActionResult> Delete(int id)
+        {
+            int userId = _userService.GetUserId();
 
-			return noteAlreadyExist
-				? Json($"Note {text} already exists.")
-				: Json(true);
-		}
+            Note note = await _repositoryNotes.GetById(id, userId);
 
-		private IEnumerable<SelectListItem> GetNoteImportance()
-		{
-			IEnumerable<NoteImportance> noteImportance = _noteImportance.GetAll().Result;
+            if (note == null)
+            {
+                return RedirectToAction(NOT_FOUND_REDIRECT, "Home");
+            }
 
-			return noteImportance.Select(item => new SelectListItem(item.Importance, item.Id.ToString()));
-		}
+            return View(note);
+        }
 
-		#endregion
-	}
+        [HttpPost]
+        public async Task<IActionResult> DeleteNote(int id)
+        {
+            int userId = _userService.GetUserId();
+
+            Note note = await _repositoryNotes.GetById(id, userId);
+
+            if (note == null)
+            {
+                return RedirectToAction(NOT_FOUND_REDIRECT, "Home");
+            }
+
+            await _repositoryNotes.Delete(id);
+
+            return RedirectToAction("Index");
+        }
+
+
+        #endregion
+
+        #region Other
+
+        [HttpGet]
+        public async Task<IActionResult> VerifyIfNoteAlreadyExist(string text)
+        {
+            bool noteAlreadyExist = await _repositoryNotes.Exists(text, _userService.GetUserId());
+
+            return noteAlreadyExist
+                ? Json($"Note {text} already exists.")
+                : Json(true);
+        }
+
+        private IEnumerable<SelectListItem> GetNoteImportance()
+        {
+            IEnumerable<NoteImportance> noteImportance = _repositoryNoteImportance.GetAll().Result;
+
+            return noteImportance.Select(item => new SelectListItem(item.Importance, item.Id.ToString()));
+        }
+
+        #endregion
+    }
 }

@@ -30,7 +30,7 @@ namespace Notes.Data
 			builder.Entity<Note>().HasData(
 				new { Id = 1, Text = "First note", UserId = 1,NoteImportanceId = 1, CreationDate = new DateTime(2010, 10, 4, 10, 30, 0) },
 				new { Id = 2, Text = "Second note!", UserId = 1, NoteImportanceId = 2, CreationDate = new DateTime(2010, 10, 5, 15, 32, 1) },
-				new { Id = 3, Text = "Second note!", UserId = 3, NoteImportanceId = 3, CreationDate = new DateTime(2011, 08, 03, 21, 16, 2) }
+				new { Id = 3, Text = "Third note!", UserId = 3, NoteImportanceId = 3, CreationDate = new DateTime(2011, 08, 03, 21, 16, 2) }
 			);
 
 			builder.Entity<NoteLike>().HasData(
@@ -39,7 +39,6 @@ namespace Notes.Data
 				new { Id = 3, NoteId = 1, UserId = 3 },
 				new { Id = 4, NoteId = 2, UserId = 3 }
 			);
-
 		}
 	}
 }
