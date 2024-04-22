@@ -37,7 +37,15 @@
 					}
 					else
 					{
-						<a id="likeBtn-@n.Id" class="btn btn-success likeButton" @*asp-action="Like" asp-route-id="@n.Id"*@><i class="bi-hand-thumbs-up-fill"></i></a>
+						if (n.Likes.Find(item => item.UserId == Model.UserId) != null)
+						{
+							<a id="setLikeBtn-@n.Id" class="btn btn-success likeButton"><i class="bi-hand-thumbs-up-fill"></i></a>
+						}
+						else
+						{
+							@* <a id="setLikeBtn-@n.Id" class="btn btn-info likeButton" asp-action="Like" asp-route-id="@n.Id"><i class="bi-hand-thumbs-up-fill"></i></a> *@
+							<a id="setLikeBtn-@n.Id" class="btn btn-secondary likeButton"><i class="bi-hand-thumbs-up-fill"></i></a>
+						}
 					}
 
 					<input type="hidden" value="@n.Id" class="id" />
@@ -58,6 +66,7 @@
 		}
 
 		const urlSetLike = '@Url.Action("SetLike", "NoteLike")';
+		const urlRemoveLike = '@Url.Action("RemoveLike", "NoteLike")';
 
 		$(function () {
 			$(".likeButton").on('click', function (e) {
@@ -70,23 +79,59 @@
 					userId: @Model.UserId, // Include the user ID directly from the model
 				};
 
-				console.log(JSON.stringify(dataToSend))
+				const button = $(this);
+				const icon = button.find("i");
+				//if it is already liked..
+				if (button.attr("class").includes("success")) {
+					$.ajax({
+						url: urlRemoveLike,
+						type: 'POST',
+						contentType: 'application/json', // Set the content type to JSON
+						data: JSON.stringify(dataToSend),
+						success: function (response, status, jqxhr) {
+							console.log("done!!: ", response)
+							const id = "#noteLikes-" + noteId;
+							//$(id).text(response.length); //alternative
+							$(id).html(response.length);
 
-				$.ajax({
-					url: urlSetLike,
-					type: 'POST',
-					contentType: 'application/json', // Set the content type to JSON
-					data: JSON.stringify(dataToSend),
-					success: function (response, status, jqxhr) {
-						console.log("done!!: ", response)
-						const id = "#noteLikes-" + noteId;
-						//$(id).text(response.length);
-						$(id).html(response.length);
-					},
-					error: function (jqxhr, status, error) {
-						console.log("fail :(");
-					}
-				});
+							button.removeClass("btn-success").addClass("btn-secondary");
+
+							/* //old implementation
+							icon
+								.removeClass("bi-hand-thumbs-down-fill")
+								.addClass("bi-hand-thumbs-up-fill");
+							*/
+						},
+						error: function (jqxhr, status, error) {
+							console.log("fail :(");
+						}
+					});
+				}
+				else {
+					$.ajax({
+						url: urlSetLike,
+						type: 'POST',
+						contentType: 'application/json', // Set the content type to JSON
+						data: JSON.stringify(dataToSend),
+						success: function (response, status, jqxhr) {
+							console.log("done!!: ", response)
+							const id = "#noteLikes-" + noteId;
+							//$(id).text(response.length);
+							$(id).html(response.length);
+
+							button.removeClass("btn-secondary").addClass("btn-success");
+
+							/* //old implementation
+							icon
+								.removeClass("bi-hand-thumbs-up-fill")
+								.addClass("bi-hand-thumbs-down-fill");
+							*/
+						},
+						error: function (jqxhr, status, error) {
+							console.log("fail :(");
+						}
+					});
+				}
 			});
 		});
 

@@ -21,10 +21,10 @@ namespace Notes.Controllers
 			_repositoryNoteImportance = repositoryNoteImportance;
 		}
 
-		#region Create
+		#region Set and remove likes
 
 		[HttpPost]
-		public async Task<IActionResult> SetLike([FromBody] LikeData data)
+		public async Task<IActionResult> SetLike([FromBody] SetLikeDto data)
 		{
 			NoteLike noteLike = new NoteLike(data.UserId, data.NoteId);
 
@@ -33,13 +33,28 @@ namespace Notes.Controllers
 
 			await _repositoryNoteImportance.Create(noteLike);
 
+			SetLikeResponseDto answer = new SetLikeResponseDto();
+			//TODO: a count would be enough?
+			answer.NoteLikes = await _repositoryNoteImportance.GetLikesByNoteId(noteLike.NoteId);
+
 			return Ok(await _repositoryNoteImportance.GetLikesByNoteId(noteLike.NoteId));
 		}
 
-		public class LikeData
+		[HttpPost]
+		public async Task<IActionResult> RemoveLike([FromBody] SetLikeDto data)
 		{
-			public int NoteId { get; set; }
-			public int UserId { get; set; }
+			NoteLike noteLike = new NoteLike(data.UserId, data.NoteId);
+
+			if (!await _repositoryNoteImportance.Exists(noteLike.NoteId, noteLike.UserId))
+				return BadRequest("Like does not exist");
+
+			await _repositoryNoteImportance.Delete(noteLike);
+
+			SetLikeResponseDto answer = new SetLikeResponseDto();
+			//TODO: a count would be enough?
+			answer.NoteLikes = await _repositoryNoteImportance.GetLikesByNoteId(noteLike.NoteId);
+
+			return Ok(await _repositoryNoteImportance.GetLikesByNoteId(noteLike.NoteId));
 		}
 
 		#endregion

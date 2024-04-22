@@ -9,6 +9,7 @@ namespace Notes.Repositories
 	public interface IRepositoryNoteLike
 	{
 		Task Create([Bind(new[] { "NoteId, UserId" })] NoteLike like);
+		Task Delete([Bind(new[] { "NoteId, UserId" })] NoteLike like);
 		Task<bool> Exists(int noteId, int userId);
 		Task<List<NoteLike>> GetLikesByNoteId(int userId);
 	}
@@ -34,6 +35,19 @@ namespace Notes.Repositories
 		{
 			_context.Add(like);
 			await _context.SaveChangesAsync();
+		}
+
+		[ValidateAntiForgeryToken]
+		public async Task Delete([Bind("NoteId, UserId")] NoteLike like)
+		{
+			NoteLike dbNoteLike = await _context.NoteLike.SingleOrDefaultAsync(n => n.UserId == like.UserId && n.NoteId == like.NoteId);
+
+			if (dbNoteLike != null)
+			{
+				_context.NoteLike.Remove(dbNoteLike);
+				await _context.SaveChangesAsync();
+
+			}
 		}
 
 		public async Task<List<NoteLike>> GetLikesByNoteId(int noteId)
