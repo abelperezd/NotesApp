@@ -34,16 +34,16 @@ namespace Notes.Controllers
 			await _repositoryNoteImportance.Create(noteLike);
 
 			SetLikeResponseDto answer = new SetLikeResponseDto();
-			//TODO: a count would be enough?
+			//TODO: a count would be eznough?
 			answer.NoteLikes = await _repositoryNoteImportance.GetLikesByNoteId(noteLike.NoteId);
 
 			return Ok(await _repositoryNoteImportance.GetLikesByNoteId(noteLike.NoteId));
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> RemoveLike([FromBody] SetLikeDto data)
+		public async Task<IActionResult> RemoveLike(int noteId, int userId)
 		{
-			NoteLike noteLike = new NoteLike(data.UserId, data.NoteId);
+			NoteLike noteLike = new NoteLike(userId, noteId);
 
 			if (!await _repositoryNoteImportance.Exists(noteLike.NoteId, noteLike.UserId))
 				return BadRequest("Like does not exist");

@@ -83,9 +83,9 @@
 	<script>
 
 		function getNoteId(button) {
-			return button.attr("id").split('-')[1];
 			//previous implementation
 			//return button.closest('tr').find('.id').val(); // Retrieve the note ID from the closest row to the button
+			return button.attr("id").split('-')[1];
 		}
 
 		$(function () {
@@ -93,14 +93,12 @@
 				e.preventDefault();
 
 				const button = $(this);
-				const id = getNoteId(button);
-
 				const toast = $("#toastRemove");
 
 				toast.modal('show');
 
+				const id = getNoteId(button);
 				toast.find(".modal-body").text($("#text-" + id).text());
-
 				toast.find("#idToRemove").val(id)
 			})
 		})
@@ -114,12 +112,8 @@
 				const toast = $("#toastRemove");
 				const noteId = toast.find("#idToRemove").val()
 
-				console.log("id: ", noteId)
-
-				const urlRemoveNote = '@Url.Action("DeleteNoteFromToast", "Notes")';
-
 				$.ajax({
-					url: urlRemoveNote,
+					url: '@Url.Action("DeleteNoteFromToast", "Notes")',
 					type: 'POST',
 					data: { id: noteId },
 					success: function (response, status, jqxhr) {
@@ -141,9 +135,6 @@
 			$(".likeButton").on('click', function (e) {
 				e.preventDefault();
 
-				const urlSetLike = '@Url.Action("SetLike", "NoteLike")';
-				const urlRemoveLike = '@Url.Action("RemoveLike", "NoteLike")';
-
 				const noteId = getNoteId($(this));
 
 				const dataToSend = {
@@ -152,54 +143,46 @@
 				};
 
 				const button = $(this);
-				const icon = button.find("i");
+
 				//if it is already liked..
 				if (button.attr("class").includes("success")) {
 					$.ajax({
-						url: urlRemoveLike,
+						url: '@Url.Action("RemoveLike", "NoteLike")',
 						type: 'POST',
-						contentType: 'application/json', // Set the content type to JSON
-						data: JSON.stringify(dataToSend),
+						data: {
+							noteId: noteId,
+							userId: @Model.UserId, // Include the user ID directly from the model
+						},
 						success: function (response, status, jqxhr) {
-							console.log("done!!: ", response)
+							console.log("Note unliked", response)
+
 							const id = "#noteLikes-" + noteId;
 							//$(id).text(response.length); //alternative
 							$(id).html(response.length);
 
 							button.removeClass("btn-success").addClass("btn-secondary");
-
-							/* //old implementation
-							icon
-								.removeClass("bi-hand-thumbs-down-fill")
-								.addClass("bi-hand-thumbs-up-fill");
-							*/
 						},
 						error: function (jqxhr, status, error) {
-							console.log("fail :(");
+							console.log("Error removing like: ", error);
 						}
 					});
 				}
 				else {
 					$.ajax({
-						url: urlSetLike,
+						url: '@Url.Action("SetLike", "NoteLike")',
 						type: 'POST',
 						contentType: 'application/json', // Set the content type to JSON
 						data: JSON.stringify(dataToSend),
 						success: function (response, status, jqxhr) {
-							console.log("done!!: ", response)
+							console.log("Note liked", response)
 							const id = "#noteLikes-" + noteId;
 							//$(id).text(response.length);
 							$(id).html(response.length);
 
 							button.removeClass("btn-secondary").addClass("btn-success");
-
-							/* //old implementation
-							icon
-								.removeClass("bi-hand-thumbs-up-fill")
-								.addClass("bi-hand-thumbs-down-fill");
-							*/
 						},
 						error: function (jqxhr, status, error) {
+							console.log("Error setting like: ", error);
 							console.log("fail :(");
 						}
 					});
