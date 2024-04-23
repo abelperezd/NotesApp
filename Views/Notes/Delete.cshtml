@@ -7,7 +7,7 @@
 
 <h3 class="mb-3">¿Delete <span style="color: red;">@Model.Text</span>?</h3>
 
-<form asp-action="DeleteNote">
+<form asp-action="DeleteNoteFromView">
 	<input type="hidden" asp-for="Id"/>
 	<button type="submit" class="btn btn-danger">Delete</button>
 	<a class="btn btn-secondary" asp-action="Index">Cancel</a>

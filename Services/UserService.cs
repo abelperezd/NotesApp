@@ -20,7 +20,7 @@ namespace Notes.Services
 
         public int GetUserId()
         {
-            return 3;
+            return 1;
         }
 
         public async Task<string> GetUserName(int userId)
