@@ -9,5 +9,7 @@ namespace Notes.Models
 	public class EditNoteDto : CreateAndEditNoteBaseDto
 	{
 		public int Id { get; set; }
+
+		public string BackUrl { get; set; }
 	}
 }

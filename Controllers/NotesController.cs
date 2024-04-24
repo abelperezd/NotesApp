@@ -24,16 +24,32 @@ namespace Notes.Controllers
 			_mapper = mapper;
 		}
 
+		#region View
+
 		public async Task<IActionResult> Index()
 		{
 			int userId = _userService.GetUserId();
 
 			IndexNoteDto dto = new IndexNoteDto();
-			dto.Notes = await _repositoryNotes.GetAll(userId);
+			dto.Notes = await _repositoryNotes.GetAll();
 			dto.UserId = _userService.GetUserId();
 
 			return View(dto);
 		}
+
+		public async Task<IActionResult> MyNotes()
+		{
+			int userId = _userService.GetUserId();
+
+			IndexNoteDto dto = new IndexNoteDto();
+			dto.Notes = await _repositoryNotes.GetAllFromUserId(userId);
+			dto.UserId = _userService.GetUserId();
+
+			return View(dto);
+		}
+
+
+		#endregion
 
 		#region Create
 
@@ -78,7 +94,7 @@ namespace Notes.Controllers
 		#region Edit
 
 		[HttpGet]
-		public async Task<ActionResult> Edit(int id)
+		public async Task<ActionResult> Edit(int id, string backUrl = null)
 		{
 			int userId = _userService.GetUserId();
 			Note note = await _repositoryNotes.GetById(id, userId);
@@ -90,12 +106,12 @@ namespace Notes.Controllers
 
 			EditNoteDto noteDto = _mapper.Map<EditNoteDto>(note);
 			noteDto.NoteImportance = GetNoteImportance();
-
+			noteDto.BackUrl = backUrl;
 			return View(noteDto);
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> Edit(Note note)
+		public async Task<ActionResult> Edit(Note note, string backUrl = null)
 		{
 			int userId = _userService.GetUserId();
 			bool exists = await _repositoryNotes.GetById(note.Id, userId) != null;
@@ -107,7 +123,7 @@ namespace Notes.Controllers
 
 			await _repositoryNotes.Update(note);
 
-			return RedirectToAction("Index");
+			return RedirectToAction(backUrl == null ?"Index" : backUrl);
 		}
 
 

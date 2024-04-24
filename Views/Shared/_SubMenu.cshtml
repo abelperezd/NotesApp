@@ -1,0 +1,12 @@
+﻿@using Notes.Models_and_DTOs.DTOs
+@model SubMenuNotes
+
+<ul class="nav nav-pills nav-fill mb-3">
+	<li class="nav-item">
+		<a class="nav-link @(Model == SubMenuNotes.All ? "active" : null)" asp-action="Index">All</a>
+	</li>
+
+	<li class="nav-item">
+		<a class="nav-link @(Model == SubMenuNotes.Mine ? "active" : null)" asp-action="MyNotes">Mine</a>
+	</li>
+</ul>

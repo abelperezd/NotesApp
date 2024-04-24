@@ -1,0 +1,16 @@
+﻿@using Notes.Models_and_DTOs.DTOs
+@model IndexNoteDto
+
+@{
+	ViewData["Title"] = "My notes";
+	Model.ThisUrl = "MyNotes";
+}
+
+
+<partial name="_SubMenu" Model="SubMenuNotes.Mine" />
+
+<h1>Notes</h1>
+
+<h5>All your notes, here!</h5>
+
+<partial name="Shared/_NotesTable" Model="Model" />

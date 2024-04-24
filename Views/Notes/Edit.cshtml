@@ -9,7 +9,7 @@
 
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-<form asp-controller="Notes" asp-action="Edit">
+<form asp-controller="Notes" asp-action="Edit" asp-route-backUrl=@Model.BackUrl>
 	<input type="hidden" asp-for="Id"/>
 
 	<div class="mb-3">
@@ -24,9 +24,9 @@
 		<span asp-validation-for="NoteImportanceId" class="text-danger"></span>
 	</div>
 
-	<button type="submit" class="btn btn-primary">Add</button>
+	<button type="submit" class="btn btn-primary">Save</button>
 
-	<a class="btn btn-secondary" asp-action="Index">Cancel</a>
+	<a class="btn btn-secondary" asp-action=@Model.BackUrl>Cancel</a>
 </form>
 
 
