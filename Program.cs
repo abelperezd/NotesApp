@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Notes.Data;
+using Notes.Models;
 using Notes.Repositories;
 using Notes.Services;
 
@@ -11,6 +13,9 @@ builder.Services.AddTransient<IRepositoryNotes, RepositotyNotes>();
 builder.Services.AddTransient<IRepositoryNoteLike, RepositotyNoteLike>();
 builder.Services.AddTransient<IRepositoryNoteImportance, RepositotyNoteImportance>();
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IRepositoryUser, RepositoryUser>();
+builder.Services.AddTransient<IUserStore<User>, UserStore>();
+builder.Services.AddIdentityCore<User>();
 builder.Services.AddAutoMapper(typeof(Program));
 //configure the db context for our models
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer("name=DefaultConnection"));

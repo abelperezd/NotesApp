@@ -22,7 +22,7 @@ namespace Notes.Models
 		public string Email { get; set; }
 
 		[Required]
-		public string PasswordHashset{ get; set; }
+		public string PasswordHash{ get; set; }
 		
 		[Required]
 		public DateOnly RegisterDate { get; set; }
