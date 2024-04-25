@@ -1,4 +1,4 @@
-﻿namespace Notes.Models_and_DTOs.DTOs
+﻿namespace Notes.Models
 {
 	public enum SubMenuNotes
 	{

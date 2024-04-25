@@ -1,2 +1,2 @@
 ﻿USE [Notes]
-DELETE FROM [dbo].[User] WHERE UserName = 'abel99'
+DELETE FROM [dbo].[User] --WHERE UserName = 'abel99'

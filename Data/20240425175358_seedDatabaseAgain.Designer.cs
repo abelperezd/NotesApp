@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Notes.Data;
 
@@ -11,9 +12,11 @@ using Notes.Data;
 namespace Notes.Data
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240425175358_seedDatabaseAgain")]
+    partial class seedDatabaseAgain
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -225,15 +228,6 @@ namespace Notes.Data
                             PasswordHashset = "e5d6",
                             RegisterDate = new DateOnly(2012, 8, 14),
                             UserName = "mar.ia15"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Email = "lolito@hotmail.com",
-                            Name = "Manolo",
-                            PasswordHashset = "f7g8",
-                            RegisterDate = new DateOnly(2013, 9, 15),
-                            UserName = "manolito"
                         });
                 });
 

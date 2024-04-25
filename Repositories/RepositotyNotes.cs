@@ -29,7 +29,7 @@ namespace Notes.Repositories
 		[ValidateAntiForgeryToken]
 		public async Task Create([Bind("Text, UserId, CreationDate")] Note note)
 		{
-			_context.Add(note);
+			_context.Note.Add(note);
 			await _context.SaveChangesAsync();
 		}
 
