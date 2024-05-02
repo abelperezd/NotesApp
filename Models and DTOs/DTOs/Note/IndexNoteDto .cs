@@ -10,7 +10,9 @@ namespace Notes.Models
 	{
 		public int UserId { get; set; }
 		public IEnumerable<Note> Notes { get; set; }
+		public IEnumerable<Note> MyNotes => Notes.Where(item => item.UserId == UserId);
 
 		public string ThisUrl { get; set; }
+
 	}
 }

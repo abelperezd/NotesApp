@@ -2,19 +2,8 @@
 
 namespace Notes.Models
 {
-	public class UserRegiserDto
+	public class UserLogInDto
 	{
-		[Required]
-		[MinLength(4)]
-		[MaxLength(20)]
-		[Display(Name = "User Name")]
-		public string UserName { get; set; }
-
-		[Required]
-		[MinLength(4)]
-		[MaxLength(50)]
-		public string Name { get; set; }
-
 		[Required]
 		[EmailAddress]
 		public string Email { get; set; }
@@ -22,5 +11,7 @@ namespace Notes.Models
 		[Required]
 		[DataType(DataType.Password)]
 		public string Password { get; set; }
+
+		public bool RememberMe { get; set; }
 	}
 }

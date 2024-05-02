@@ -15,7 +15,22 @@ builder.Services.AddTransient<IRepositoryNoteImportance, RepositotyNoteImportanc
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IRepositoryUser, RepositoryUser>();
 builder.Services.AddTransient<IUserStore<User>, UserStore>();
-builder.Services.AddIdentityCore<User>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<SignInManager<User>>();
+builder.Services.AddIdentityCore<User>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+    options.Password.RequireNonAlphanumeric = false;
+});
+
+//configure the cookies for the authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultSignOutScheme = IdentityConstants.ApplicationScheme;
+}).AddCookie(IdentityConstants.ApplicationScheme);
+
 builder.Services.AddAutoMapper(typeof(Program));
 //configure the db context for our models
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer("name=DefaultConnection"));
@@ -35,6 +50,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

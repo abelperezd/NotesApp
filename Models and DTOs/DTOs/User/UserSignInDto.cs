@@ -2,32 +2,25 @@
 
 namespace Notes.Models
 {
-	public class User
+	public class UserSignInDto
 	{
 		[Required]
-		public int Id { get; set; }
+		[MinLength(4)]
+		[MaxLength(20)]
+		[Display(Name = "User Name")]
+		public string UserName { get; set; }
 
 		[Required]
 		[MinLength(4)]
 		[MaxLength(50)]
-		public string UserName { get; set; }
-
-
-		[Required]
-		[MinLength(4)]
-		[MaxLength(20)]
 		public string Name { get; set; }
 
-		//TODO: do not allow duplicated mails
 		[Required]
+		[EmailAddress]
 		public string Email { get; set; }
 
 		[Required]
-		public string PasswordHash{ get; set; }
-		
-		[Required]
-		public DateOnly RegisterDate { get; set; }
-
-
+		[DataType(DataType.Password)]
+		public string Password { get; set; }
 	}
 }

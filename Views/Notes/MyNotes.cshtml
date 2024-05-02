@@ -5,6 +5,10 @@
 	Model.ThisUrl = "MyNotes";
 }
 
+@if (Model.UserId == -1)
+{
+	<script>window.location.href = '@Url.Action("Login", "User")';</script>
+}
 
 <partial name="_SubMenu" Model="SubMenuNotes.Mine" />
 

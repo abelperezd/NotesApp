@@ -54,10 +54,10 @@ namespace Notes.Repositories
 		public async Task<IEnumerable<Note>> GetAllFromUserId(int userId)
 		{
 			return _context.Note
+				.Where(item => item.UserId == userId)
 				.Include(item => item.Likes)
 				.Include(item => item.NoteImportance)
-				.Include(item => item.User)
-				.Where(item => item.UserId == userId);
+				.Include(item => item.User);
 		}
 
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Notes.Models;
 
@@ -7,18 +8,24 @@ namespace Notes.Controllers
 	public class UserController : Controller
 	{
 		private readonly UserManager<User> _userManager;
+		private readonly SignInManager<User> _signInManager;
 
-		public UserController(UserManager<User> userManager)
+		public UserController(UserManager<User> userManager, SignInManager<User> signInManager)
 		{
 			_userManager = userManager;
+			_signInManager = signInManager;
 		}
-		public IActionResult Register()
+
+		#region Sign in
+
+
+		public IActionResult Signin()
 		{
 			return View();
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Register(UserRegiserDto userDto)
+		public async Task<IActionResult> Signin(UserSignInDto userDto)
 		{
 			if (!ModelState.IsValid)
 				return View(userDto);
@@ -37,6 +44,7 @@ namespace Notes.Controllers
 
 			if (result.Succeeded)
 			{
+				await _signInManager.SignInAsync(user, isPersistent: false);
 				return RedirectToAction("Index", "Notes");
 			}
 			else
@@ -48,5 +56,45 @@ namespace Notes.Controllers
 
 		}
 
+		#endregion
+
+		[HttpGet]
+		#region Log in
+		public IActionResult Login()
+		{
+			return View();
+		}
+
+		[HttpPost]
+		public async Task <IActionResult> Login(UserLogInDto dto)
+		{
+			if(!ModelState.IsValid) 
+				return View(dto);
+
+			Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(dto.Email, dto.Password, dto.RememberMe, lockoutOnFailure: false);
+
+			if (result.Succeeded)
+			{
+				return RedirectToAction("Index", "Notes");
+			}
+			else
+			{
+				ModelState.AddModelError(string.Empty, "Wrong email or password.");
+				return View(dto);
+			}
+		}
+
+		#endregion
+
+		#region Log out
+
+		[HttpPost]
+		public async Task<IActionResult> Logout()
+		{
+			await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+			return RedirectToAction("Index", "Notes");
+		}
+
+		#endregion
 	}
 }

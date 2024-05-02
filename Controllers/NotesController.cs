@@ -28,8 +28,6 @@ namespace Notes.Controllers
 
 		public async Task<IActionResult> Index()
 		{
-			int userId = _userService.GetUserId();
-
 			IndexNoteDto dto = new IndexNoteDto();
 			dto.Notes = await _repositoryNotes.GetAll();
 			dto.UserId = _userService.GetUserId();

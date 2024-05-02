@@ -94,10 +94,10 @@ namespace Notes.Services
 
 		#region Name
 
-		//In fact, find by user name
+		//In fact, find by email
 		public async Task<User?> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
 		{
-			return await _repositoryUser.GetByUserName(normalizedUserName);
+			return await _repositoryUser.GetByEmail(normalizedUserName);
 		}
 
 		#endregion
