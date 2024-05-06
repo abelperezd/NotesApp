@@ -14,5 +14,7 @@ namespace Notes.Models
 
 		public string ThisUrl { get; set; }
 
+		public SubMenuNotes SubMenuNotes { get; set; }
+
 	}
 }

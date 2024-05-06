@@ -26,26 +26,24 @@ namespace Notes.Controllers
 
 		#region View
 
-		public async Task<IActionResult> Index()
+		public async Task<IActionResult> Index(string toShow = null)
 		{
 			IndexNoteDto dto = new IndexNoteDto();
-			dto.Notes = await _repositoryNotes.GetAll();
 			dto.UserId = _userService.GetUserId();
+			dto.SubMenuNotes = string.IsNullOrEmpty(toShow) ? SubMenuNotes.All : (SubMenuNotes)Enum.Parse(typeof(SubMenuNotes), toShow); ;
+
+			if (dto.SubMenuNotes == SubMenuNotes.All)
+			{
+				dto.Notes = await _repositoryNotes.GetAll();
+			}
+			else
+			{
+				dto.Notes = await _repositoryNotes.GetAllFromUserId(dto.UserId);
+
+			}
 
 			return View(dto);
 		}
-
-		public async Task<IActionResult> MyNotes()
-		{
-			int userId = _userService.GetUserId();
-
-			IndexNoteDto dto = new IndexNoteDto();
-			dto.Notes = await _repositoryNotes.GetAllFromUserId(userId);
-			dto.UserId = _userService.GetUserId();
-
-			return View(dto);
-		}
-
 
 		#endregion
 
@@ -121,7 +119,7 @@ namespace Notes.Controllers
 
 			await _repositoryNotes.Update(note);
 
-			return RedirectToAction(backUrl == null ?"Index" : backUrl);
+			return RedirectToAction(backUrl == null ? "Index" : backUrl);
 		}
 
 
