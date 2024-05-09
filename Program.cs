@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Notes.Data;
 using Notes.Models;
@@ -7,8 +9,13 @@ using Notes.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var authUsersPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+	options.Filters.Add(new AuthorizeFilter(authUsersPolicy)); //to make compulsory to be identified to access to everything
+});
 builder.Services.AddTransient<IRepositoryNotes, RepositotyNotes>();
 builder.Services.AddTransient<IRepositoryNoteLike, RepositotyNoteLike>();
 builder.Services.AddTransient<IRepositoryNoteImportance, RepositotyNoteImportance>();
@@ -19,17 +26,22 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<SignInManager<User>>();
 builder.Services.AddIdentityCore<User>(options =>
 {
-    options.User.RequireUniqueEmail = true;
-    options.Password.RequireNonAlphanumeric = false;
+	options.User.RequireUniqueEmail = true;
+	options.Password.RequireNonAlphanumeric = false;
 });
 
 //configure the cookies for the authentication
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
-    options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
-    options.DefaultSignOutScheme = IdentityConstants.ApplicationScheme;
-}).AddCookie(IdentityConstants.ApplicationScheme);
+	options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+	options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+	options.DefaultSignOutScheme = IdentityConstants.ApplicationScheme;
+}).AddCookie(IdentityConstants.ApplicationScheme, options =>
+{
+	options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+	options.LoginPath = "/user/login";
+});
+
 
 builder.Services.AddAutoMapper(typeof(Program));
 //configure the db context for our models
@@ -40,9 +52,9 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+	app.UseExceptionHandler("/Home/Error");
+	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+	app.UseHsts();
 }
 
 app.UseHttpsRedirection();
@@ -54,7 +66,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Notes}/{action=Index}/{id?}");
+	name: "default",
+	pattern: "{controller=Notes}/{action=Index}/{id?}");
 
 app.Run();

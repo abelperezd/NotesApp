@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Notes.Models;
@@ -7,6 +8,7 @@ using Notes.Services;
 
 namespace Notes.Controllers
 {
+	//[Authorize] //if we want authorization for all the actions of the controller
 	public class NotesController : Controller
 	{
 		private const string NOT_FOUND_REDIRECT = "NotFound";
@@ -26,6 +28,7 @@ namespace Notes.Controllers
 
 		#region View
 
+		[AllowAnonymous] //to allow unidentified users
 		public async Task<IActionResult> Index(string toShow = null)
 		{
 			IndexNoteDto dto = new IndexNoteDto();
@@ -90,7 +93,8 @@ namespace Notes.Controllers
 		#region Edit
 
 		[HttpGet]
-		public async Task<ActionResult> Edit(int id, string backUrl = null)
+		[Authorize]
+		public async Task<ActionResult> Edit(int id, string toShow = null)
 		{
 			int userId = _userService.GetUserId();
 			Note note = await _repositoryNotes.GetById(id, userId);
@@ -102,12 +106,13 @@ namespace Notes.Controllers
 
 			EditNoteDto noteDto = _mapper.Map<EditNoteDto>(note);
 			noteDto.NoteImportance = GetNoteImportance();
-			noteDto.BackUrl = backUrl;
+			noteDto.BackUrl = string.IsNullOrEmpty(toShow) ? SubMenuNotes.All : (SubMenuNotes)Enum.Parse(typeof(SubMenuNotes), toShow);
 			return View(noteDto);
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> Edit(Note note, string backUrl = null)
+		[Authorize]
+		public async Task<ActionResult> Edit(Note note, string toShow = null)
 		{
 			int userId = _userService.GetUserId();
 			bool exists = await _repositoryNotes.GetById(note.Id, userId) != null;
@@ -119,7 +124,7 @@ namespace Notes.Controllers
 
 			await _repositoryNotes.Update(note);
 
-			return RedirectToAction(backUrl == null ? "Index" : backUrl);
+			return RedirectToAction("Index", string.IsNullOrEmpty(toShow) ? SubMenuNotes.All : (SubMenuNotes)Enum.Parse(typeof(SubMenuNotes), toShow));
 		}
 
 
@@ -127,6 +132,7 @@ namespace Notes.Controllers
 
 		#region Delete
 
+		[Authorize]
 		public async Task<IActionResult> Delete(int id)
 		{
 			int userId = _userService.GetUserId();
@@ -142,6 +148,7 @@ namespace Notes.Controllers
 		}
 
 		[HttpPost]
+		[Authorize]
 		public async Task<IActionResult> DeleteNoteFromView(int id)
 		{
 			int userId = _userService.GetUserId();
@@ -159,6 +166,7 @@ namespace Notes.Controllers
 		}
 
 		[HttpPost]
+		[Authorize]
 		public async Task<IActionResult> DeleteNoteFromToast(int id)
 		{
 			int userId = _userService.GetUserId();

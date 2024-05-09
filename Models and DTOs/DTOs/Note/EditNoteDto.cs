@@ -10,6 +10,6 @@ namespace Notes.Models
 	{
 		public int Id { get; set; }
 
-		public string BackUrl { get; set; }
+		public SubMenuNotes BackUrl { get; set; }
 	}
 }

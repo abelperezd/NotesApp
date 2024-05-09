@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Notes.Models;
 
 namespace Notes.Controllers
 {
+	[AllowAnonymous] //to allow unidentified users
 	public class UserController : Controller
 	{
 		private readonly UserManager<User> _userManager;
