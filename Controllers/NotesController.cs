@@ -191,12 +191,14 @@ namespace Notes.Controllers
 		#region Other
 
 		[HttpGet]
-		public async Task<IActionResult> VerifyIfNoteAlreadyExist(string text)
+		public async Task<IActionResult> VerifyIfNoteAlreadyExist(string text, int? id = null)
 		{
-			bool noteAlreadyExist = await _repositoryNotes.Exists(text, _userService.GetUserId());
+			bool noteAlreadyExist = id == null
+				? await _repositoryNotes.Exists(text, _userService.GetUserId())
+				: await _repositoryNotes.ExistsAndIsNotItself(text, _userService.GetUserId(), id.Value);
 
 			return noteAlreadyExist
-				? Json($"Note {text} already exists.")
+				? Json($"Note '{text}' already exists.")
 				: Json(true);
 		}
 

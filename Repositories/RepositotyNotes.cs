@@ -11,6 +11,7 @@ namespace Notes.Repositories
 		Task Create([Bind(["Text, UserId, CreationDate"])] Note note);
 		Task Delete(int id);
 		Task<bool> Exists(string text, int userId);
+		Task<bool> ExistsAndIsNotItself(string text, int userId, int id);
 		Task<IEnumerable<Note>> GetAll();
 		Task<IEnumerable<Note>> GetAllFromUserId(int userId);
 		Task<Note> GetById(int id, int userId);
@@ -40,6 +41,14 @@ namespace Notes.Repositories
 		public async Task<bool> Exists(string text, int userId)
 		{
 			return await _context.Note.FirstOrDefaultAsync(item => item.Text.ToLower().Equals(text.ToLower()) && item.UserId == userId) != default;
+		}
+
+		/// <summary>
+		/// Doesn't make much sense, but for learning pourposes. It returns if the user already have an equal note.
+		/// </summary>
+		public async Task<bool> ExistsAndIsNotItself(string text, int userId, int id)
+		{
+			return await _context.Note.FirstOrDefaultAsync(item => item.Text.ToLower().Equals(text.ToLower()) && item.UserId == userId && item.Id != id) != default;
 		}
 
 		public async Task<IEnumerable<Note>> GetAll()
